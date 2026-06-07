@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Knowledge Hub</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    /* Brand Colors */
+    --green-50: #EAF3DE; --green-100: #C0DD97; --green-600: #3B6D11; --green-800: #27500A;
+    --teal-50: #E1F5EE; --teal-100: #9FE1CB; --teal-600: #0F6E56; --teal-800: #085041;
+    --amber-50: #FAEEDA; --amber-600: #854F0B;
+    --blue-50: #E6F1FB; --blue-600: #185FA5; --blue-800: #0C447C;
+    --coral-50: #FAECE7; --coral-600: #993C1D;
+    --purple-50: #EEEDFE; --purple-600: #534AB7;
+
+    /* Base Variables (Light Mode) */
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f8fafc;
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-tertiary: #94a3b8;
+    --color-border-primary: #cbd5e1;
+    --color-border-secondary: #e2e8f0;
+    --color-border-tertiary: #f1f5f9;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+  }
+
+  /* Cinematic Dark Mode */
+  body.dark-vibe {
+    --color-background-primary: #0f1115;
+    --color-background-secondary: #1a1d24;
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-text-tertiary: #64748b;
+    --color-border-primary: #334155;
+    --color-border-secondary: #1e293b;
+    --color-border-tertiary: #0f172a;
+  }
+
+  body { 
+    font-family: var(--font-sans); 
+    background-color: var(--color-background-primary); 
+    color: var(--color-text-primary);
+    transition: background-color 0.4s ease, color 0.4s ease;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .hub { width: 100%; max-width: 900px; }
+
+  /* HEADER */
+  .header { padding: 1.5rem 0 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.5rem; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .logo { width: 36px; height: 36px; border-radius: var(--border-radius-md); background: #3B6D11; display: flex; align-items: center; justify-content: center; }
+  .logo i { color: #C0DD97; font-size: 20px; }
+  .site-title { font-size: 18px; font-weight: 600; color: var(--color-text-primary); }
+  .site-sub { font-size: 13px; color: var(--color-text-secondary); }
+  
+  /* PREMIUM NAVIGATION */
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav-btn {
+    position: relative;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  .nav-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--green-600);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateX(-50%);
+    border-radius: 2px;
+  }
+  .nav-btn:hover { color: var(--green-600); }
+  .nav-btn.active { color: var(--color-text-primary); font-weight: 600; }
+  .nav-btn.active::after { width: 80%; }
+
+  /* CINEMATIC ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .section { display: none; }
+  .section.visible { 
+    display: block; 
+    animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* SEARCH BAR */
+  .search-wrap { position: relative; margin-bottom: 1.25rem; }
+  .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-tertiary); font-size: 16px; }
+  .search-wrap input { width: 100%; padding: 12px 12px 12px 40px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); background: var(--color-background-secondary); font-size: 14px; color: var(--color-text-primary); transition: border-color 0.3s; }
+  .search-wrap input:focus { outline: none; border-color: var(--green-600); }
+
+  /* GRID & CARDS */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease; will-change: transform, box-shadow; }
+  .card-sm { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem; cursor: pointer; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease; border: 0.5px solid var(--color-border-tertiary); }
+  
+  .card:hover, .card-sm:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(59, 109, 17, 0.08); 
+    border-color: var(--color-border-primary);
+  }
+
+  .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-tertiary); margin-bottom: 0.75rem; }
+  
+  /* INTERACTIVE CHIPS & TAGS */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+  .chip { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 0.5px solid var(--color-border-secondary); cursor: pointer; color: var(--color-text-secondary); transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); background: var(--color-background-secondary); }
+  .chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    color: var(--color-text-primary);
+  }
+  .chip.selected {
+    background: var(--green-600);
+    color: #fff;
+    border-color: var(--green-600);
+    box-shadow: 0 4px 12px rgba(59, 109, 17, 0.3);
+  }
+
+  /* METRICS & MISC */
+  .metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem; border: 0.5px solid var(--color-border-tertiary); }
+  .metric-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; font-weight: 500; }
+  .metric-value { font-size: 24px; font-weight: 600; color: var(--color-text-primary); }
+  .metric-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+  
+  .tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+  .tag.green { background: var(--green-50); color: var(--green-600); }
+  .tag.teal { background: var(--teal-50); color: var(--teal-600); }
+  .tag.amber { background: var(--amber-50); color: var(--amber-600); }
+  .tag.blue { background: var(--blue-50); color: var(--blue-600); }
+  .tag.coral { background: var(--coral-50); color: var(--coral-600); }
+  .tag.purple { background: var(--purple-50); color: var(--purple-600); }
+  
+  .row-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 14px; }
+  .row-item:last-child { border-bottom: none; }
+  
+  /* FORMS & BUTTONS */
+  .input-row { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+  .input-row input, .input-row select { flex: 1; padding: 10px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); font-size: 14px; color: var(--color-text-primary); transition: border-color 0.3s; }
+  .input-row input:focus, .input-row select:focus { outline: none; border-color: var(--green-600); }
+  
+  .btn-primary { 
+    padding: 10px 24px; 
+    border-radius: var(--border-radius-md); 
+    background: var(--green-600); 
+    color: #fff; 
+    border: none; 
+    font-size: 14px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    width: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(59, 109, 17, 0.4);
+    background: var(--green-800);
+  }
+  
+  label.form-label { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); display: block; margin-bottom: 6px; }
+  
+  .disclaimer { font-size: 12px; line-height: 1.5; color: var(--color-text-tertiary); margin-top: 1rem; padding: 0.75rem 1rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); }
+  
+  /* TABLES */
+  .food-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; }
+  .food-table th { text-align: left; padding: 10px 8px; font-weight: 600; color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .food-table td { padding: 10px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+  
+  .level { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .level.H { background: var(--green-50); color: var(--green-600); }
+  .level.M { background: var(--amber-50); color: var(--amber-600); }
+  .level.L { background: var(--color-background-secondary); color: var(--color-text-tertiary); }
+  .level.N { background: var(--coral-50); color: var(--coral-600); }
+  
+  .dots { display: flex; gap: 4px; margin-top: 2px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-border-tertiary); }
+  .dot.filled { background: var(--green-600); }
+  
+  /* AI CHAT */
+  .ai-msg { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 10px; font-size: 14px; line-height: 1.6; border: 0.5px solid var(--color-border-tertiary); }
+  .ai-msg.user { background: var(--green-50); border-color: var(--green-100); color: var(--green-800); text-align: right; margin-left: 20%; }
+  
+  .ai-input-row { display: flex; gap: 8px; margin-top: 1rem; }
+  .ai-input-row input { flex: 1; padding: 12px 16px; border: 0.5px solid var(--color-border-secondary); border-radius: 24px; font-size: 14px; background: var(--color-background-secondary); color: var(--color-text-primary); transition: border-color 0.3s; }
+  .ai-input-row input:focus { outline: none; border-color: var(--green-600); }
+  .ai-input-row button { width: 44px; height: 44px; border-radius: 50%; background: var(--green-600); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
+  .ai-input-row button:hover { transform: scale(1.05); background: var(--green-800); }
+  .ai-thinking { color: var(--color-text-tertiary); font-size: 13px; font-style: italic; background: transparent; border: none; padding: 0.5rem 1rem; }
+  
+  .progress-bar-bg { height: 6px; background: var(--color-border-secondary); border-radius: 3px; margin: 8px 0 16px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 3px; background: var(--green-600); }
+</style>
+</head>
+<body>
+
+<div class="hub">
+  <div class="header">
+    <div class="header-top">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="logo"><i class="ti ti-leaf" aria-hidden="true"></i></div>
+        <div>
+          <div class="site-title">Health Knowledge Hub</div>
+          <div class="site-sub">Nutrition · Fitness · Wellness — all in one place</div>
+        </div>
+      </div>
+      <button id="theme-toggle" style="background:transparent; border:none; color:var(--color-text-primary); cursor:pointer; padding:8px; border-radius:50%; transition: background 0.3s;">
+        <i class="ti ti-moon" style="font-size: 20px;"></i>
+      </button>
+    </div>
+    
+    <div class="nav">
+      <button class="nav-btn active" onclick="showSection('home')"><i class="ti ti-home" style="font-size:14px;margin-right:6px"></i>Home</button>
+      <button class="nav-btn" onclick="showSection('bmi')"><i class="ti ti-calculator" style="font-size:14px;margin-right:6px"></i>BMI</button>
+      <button class="nav-btn" onclick="showSection('nutrients')"><i class="ti ti-pill" style="font-size:14px;margin-right:6px"></i>Nutrients</button>
+      <button class="nav-btn" onclick="showSection('foods')"><i class="ti ti-salad" style="font-size:14px;margin-right:6px"></i>Foods</button>
+      <button class="nav-btn" onclick="showSection('deficiency')"><i class="ti ti-stethoscope" style="font-size:14px;margin-right:6px"></i>Deficiency</button>
+      <button class="nav-btn" onclick="showSection('diseases')"><i class="ti ti-heart-rate-monitor" style="font-size:14px;margin-right:6px"></i>Diseases</button>
+      <button class="nav-btn" onclick="showSection('fitness')"><i class="ti ti-barbell" style="font-size:14px;margin-right:6px"></i>Fitness</button>
+      <button class="nav-btn" onclick="showSection('water')"><i class="ti ti-droplet" style="font-size:14px;margin-right:6px"></i>Water</button>
+      <button class="nav-btn" onclick="showSection('calories')"><i class="ti ti-flame" style="font-size:14px;margin-right:6px"></i>Calories</button>
+      <button class="nav-btn" onclick="showSection('ai')"><i class="ti ti-message-circle" style="font-size:14px;margin-right:6px"></i>AI Chat</button>
+    </div>
+  </div>
+
+  <div id="sec-home" class="section visible">
+    <div class="section-label">Quick access</div>
+    <div class="grid-3">
+      <div class="card-sm" onclick="showSection('bmi')">
+        <i class="ti ti-calculator" style="font-size:24px;color:var(--green-600);margin-bottom:8px;display:block" aria-hidden="true"></i>
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">BMI Calculator</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Weight category & calorie needs</div>
+      </div>
+      <div class="card-sm" onclick="showSection('nutrients')">
+        <i class="ti ti-pill" style="font-size:24px;color:var(--blue-600);margin-bottom:8px;display:block" aria-hidden="true"></i>
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">Nutrient Database</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Functions, sources & daily needs</div>
+      </div>
+      <div class="card-sm" onclick="showSection('foods')">
+        <i class="ti ti-salad" style="font-size:24px;color:var(--teal-600);margin-bottom:8px;display:block" aria-hidden="true"></i>
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">Food Database</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Nutrient profiles per food</div>
+      </div>
+      <div class="card-sm" onclick="showSection('deficiency')">
+        <i class="ti ti-stethoscope" style="font-size:24px;color:var(--amber-600);margin-bottom:8px;display:block" aria-hidden="true"></i>
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">Deficiency Checker</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Match symptoms to deficiencies</div>
+      </div>
+      <div class="card-sm" onclick="showSection('diseases')">
+        <i class="ti ti-heart-rate-monitor" style="font-size:24px;color:var(--coral-600);margin-bottom:8px;display:block" aria-hidden="true"></i>
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">Disease & Prevention</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Causes, symptoms & diet tips</div>
+      </div>
+      <div class="card-sm" onclick="showSection('fitness')">
+        <i class="ti ti-barbell" style="font-size:24px;color:var(--purple-600);margin-bottom:8px;display:block" aria-hidden="true"></i>
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">Fitness Planner</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Workouts & diet plans</div>
+      </div>
+      <div class="card-sm" onclick="showSection('water')">
+        <i class="ti ti-droplet" style="font-size:24px;color:var(--blue-600);margin-bottom:8px;display:block" aria-hidden="true"></i>
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">Water Calculator</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Daily intake by activity</div>
+      </div>
+      <div class="card-sm" onclick="showSection('calories')">
+        <i class="ti ti-flame" style="font-size:24px;color:var(--coral-600);margin-bottom:8px;display:block" aria-hidden="true"></i>
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">Calorie Calculator</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">BMR, maintenance & goals</div>
+      </div>
+      <div class="card-sm" onclick="showSection('ai')">
+        <i class="ti ti-message-circle" style="font-size:24px;color:var(--green-600);margin-bottom:8px;display:block" aria-hidden="true"></i>
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">AI Health Assistant</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Ask anything about nutrition</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="section-label">Food → Nutrient Map</div>
+      <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:1rem">Click a mineral to see its top food sources</div>
+      <div class="chip-row" id="nutrient-chips"></div>
+      <div id="food-map-result" style="font-size:14px;color:var(--color-text-secondary); padding: 1rem; background: var(--color-background-secondary); border-radius: var(--border-radius-md);">
+        Select a nutrient above to explore its best food sources.
+      </div>
+    </div>
+  </div>
+
+  <div id="sec-bmi" class="section">
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-label">BMI Calculator</div>
+        <label class="form-label">Height (cm)</label>
+        <div class="input-row"><input type="number" id="bmi-h" placeholder="e.g. 170"></div>
+        <label class="form-label">Weight (kg)</label>
+        <div class="input-row"><input type="number" id="bmi-w" placeholder="e.g. 65"></div>
+        <label class="form-label">Gender</label>
+        <div class="input-row">
+          <select id="bmi-gender">
+            <option>Male</option><option>Female</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="calcBMI()">Calculate BMI</button>
+      </div>
+      
+      <div id="bmi-result" class="card" style="display:none">
+        <div class="section-label">Your results</div>
+        <div class="grid-2" style="margin-bottom:1rem; gap:8px;">
+          <div class="metric"><div class="metric-label">BMI</div><div class="metric-value" id="bmi-val">—</div></div>
+          <div class="metric"><div class="metric-label">Category</div><div class="metric-value" style="font-size:18px" id="bmi-cat">—</div></div>
+        </div>
+        <div class="metric" style="margin-bottom:1rem">
+          <div class="metric-label">Daily calorie estimate</div>
+          <div class="metric-value" id="bmi-cal">—</div>
+          <div class="metric-sub" id="bmi-cal-sub"></div>
+        </div>
+        <div class="section-label">Suggested foods</div>
+        <div id="bmi-foods" style="font-size:14px;line-height:1.6;color:var(--color-text-primary);margin-bottom:1rem"></div>
+        <div class="section-label">Suggested exercises</div>
+        <div id="bmi-exer" style="font-size:14px;line-height:1.6;color:var(--color-text-primary)"></div>
+      </div>
+    </div>
+    
+    <div class="card" style="margin-top:1rem">
+      <div class="section-label">BMI scale reference</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="tag blue">Under 18.5 — Underweight</span>
+        <span class="tag green">18.5–24.9 — Normal</span>
+        <span class="tag amber">25–29.9 — Overweight</span>
+        <span class="tag coral">30+ — Obese</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="sec-nutrients" class="section">
+    <div class="search-wrap">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input type="text" id="nut-search" placeholder="Search Protein, Vitamin C, Iron…" oninput="filterNutrients()">
+    </div>
+    <div id="nut-list" style="display:flex; flex-direction:column; gap:1rem;"></div>
+  </div>
+
+  <div id="sec-foods" class="section">
+    <div class="search-wrap">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input type="text" id="food-search" placeholder="Search 'calcium rich', 'protein foods', 'Vitamin B12'…" oninput="filterFoods()">
+    </div>
+    <div class="card">
+      <div class="section-label" style="margin-bottom:1rem">Nutrient levels per food</div>
+      <div style="overflow-x:auto">
+        <table class="food-table" id="food-table">
+          <thead><tr><th>Food</th><th>Protein</th><th>Calcium</th><th>Iron</th><th>Vitamin C</th><th>Fiber</th><th>Vitamin D</th></tr></thead>
+          <tbody id="food-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="sec-deficiency" class="section">
+    <div class="card" style="margin-bottom:1rem">
+      <div class="section-label">Select your symptoms</div>
+      <div class="chip-row" id="symptom-chips"></div>
+      <button class="btn-primary" onclick="checkDeficiency()" style="width:auto; margin-top:0.5rem">Check possible deficiencies</button>
+      <div class="disclaimer">
+        <i class="ti ti-info-circle" style="font-size:16px;vertical-align:middle;margin-right:6px"></i>
+        Educational only — not a medical diagnosis. Consult a healthcare professional.
+      </div>
+    </div>
+    <div id="def-result"></div>
+  </div>
+
+  <div id="sec-diseases" class="section">
+    <div class="chip-row" id="disease-chips"></div>
+    <div id="disease-detail"></div>
+  </div>
+
+  <div id="sec-fitness" class="section">
+    <div class="chip-row">
+      <span class="chip selected" onclick="selectFitness('home',this)">Home workouts</span>
+      <span class="chip" onclick="selectFitness('gym',this)">Gym workouts</span>
+      <span class="chip" onclick="selectFitness('stretch',this)">Stretching</span>
+      <span class="chip" onclick="selectFitness('loss',this)">Weight loss plan</span>
+      <span class="chip" onclick="selectFitness('muscle',this)">Muscle gain plan</span>
+    </div>
+    <div id="fitness-detail"></div>
+  </div>
+
+  <div id="sec-water" class="section">
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-label">Daily water intake</div>
+        <label class="form-label">Weight (kg)</label>
+        <div class="input-row"><input type="number" id="w-weight" placeholder="e.g. 65"></div>
+        <label class="form-label">Activity level</label>
+        <div class="input-row">
+          <select id="w-activity">
+            <option value="1">Sedentary (desk job)</option>
+            <option value="1.2">Lightly active</option>
+            <option value="1.4">Moderately active</option>
+            <option value="1.6">Very active (gym daily)</option>
+          </select>
+        </div>
+        <label class="form-label">Climate</label>
+        <div class="input-row">
+          <select id="w-climate">
+            <option value="0">Temperate</option>
+            <option value="0.3">Hot / Humid</option>
+            <option value="0.5">Very hot / Tropical</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="calcWater()">Calculate Target</button>
+      </div>
+      
+      <div id="water-result" class="card" style="display:none">
+        <div class="section-label">Daily water target</div>
+        <div class="metric" style="margin-bottom:1.5rem">
+          <div class="metric-label">Recommended intake</div>
+          <div class="metric-value" id="water-val">—</div>
+          <div class="metric-sub" id="water-sub"></div>
+        </div>
+        <div class="section-label" style="margin-top:0">Hydration tips</div>
+        <div id="water-tips" style="font-size:14px;line-height:1.6;color:var(--color-text-primary)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sec-calories" class="section">
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-label">Calorie calculator (Mifflin-St Jeor)</div>
+        <label class="form-label">Age</label>
+        <div class="input-row"><input type="number" id="c-age" placeholder="e.g. 25"></div>
+        <label class="form-label">Height (cm)</label>
+        <div class="input-row"><input type="number" id="c-h" placeholder="e.g. 170"></div>
+        <label class="form-label">Weight (kg)</label>
+        <div class="input-row"><input type="number" id="c-w" placeholder="e.g. 65"></div>
+        <label class="form-label">Gender</label>
+        <div class="input-row"><select id="c-gender"><option value="m">Male</option><option value="f">Female</option></select></div>
+        <label class="form-label">Activity level</label>
+        <div class="input-row">
+          <select id="c-act">
+            <option value="1.2">Sedentary</option>
+            <option value="1.375">Light activity</option>
+            <option value="1.55">Moderate</option>
+            <option value="1.725">Very active</option>
+            <option value="1.9">Extra active</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="calcCalories()">Calculate Macros</button>
+      </div>
+      
+      <div id="cal-result" class="card" style="display:none">
+        <div class="section-label">Your calorie targets</div>
+        <div class="grid-2" style="margin-bottom:1rem">
+          <div class="metric"><div class="metric-label">BMR</div><div class="metric-value" id="cal-bmr">—</div><div class="metric-sub">Base metabolic rate</div></div>
+          <div class="metric"><div class="metric-label">Maintenance</div><div class="metric-value" id="cal-main">—</div><div class="metric-sub">Stay same weight</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="metric"><div class="metric-label">Weight loss</div><div class="metric-value" id="cal-loss">—</div><div class="metric-sub">−500 kcal/day</div></div>
+          <div class="metric"><div class="metric-label">Weight gain</div><div class="metric-value" id="cal-gain">—</div><div class="metric-sub">+500 kcal/day</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sec-ai" class="section">
+    <div class="card">
+      <div class="section-label">AI Health Assistant</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem">Powered by Claude · Educational only, not medical advice</div>
+      
+      <div id="ai-messages" style="max-height: 400px; overflow-y: auto; padding-right: 10px; display:flex; flex-direction:column;">
+        <div class="ai-msg">
+          <strong style="font-size:13px;color:var(--green-600);display:block;margin-bottom:4px;">Health Hub AI</strong>
+          Hi! I can answer questions about nutrition, deficiencies, diets, and fitness. What would you like to know?
+        </div>
+      </div>
+      
+      <div class="chip-row" style="margin-top:1rem">
+        <span class="chip" onclick="askAI('What foods are rich in iron?')">Iron-rich foods</span>
+        <span class="chip" onclick="askAI('Suggest a vegetarian protein diet')">Veg protein diet</span>
+        <span class="chip" onclick="askAI('Why am I always tired?')">Why am I tired?</span>
+        <span class="chip" onclick="askAI('How much calcium do I need daily?')">Calcium daily need</span>
+      </div>
+      
+      <div class="ai-input-row">
+        <input type="text" id="ai-input" placeholder="Ask anything about nutrition or health…" onkeydown="if(event.key==='Enter')askAI()">
+        <button onclick="askAI()"><i class="ti ti-send" style="font-size:18px" aria-hidden="true"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- DATA DEFINITIONS ---
+const NUTRIENTS = [
+  { name: "Protein", icon: "ti-meat", color: "coral", fn: "Builds and repairs muscle, enzymes, and immune cells", daily: "0.8–1.6 g per kg body weight", deficiency: "Muscle wasting, fatigue, slow healing, hair loss", excess: "Kidney strain, dehydration", sources: "Eggs, chicken, lentils, tofu, fish, paneer", score: 95 },
+  { name: "Carbohydrates", icon: "ti-bread", color: "amber", fn: "Primary energy source for brain and muscles", daily: "130–300 g/day depending on activity", deficiency: "Fatigue, brain fog, ketosis", excess: "Weight gain, blood sugar spikes", sources: "Rice, wheat, oats, potato, banana, millets", score: 80 },
+  { name: "Fats", icon: "ti-droplet", color: "blue", fn: "Hormone production, fat-soluble vitamin absorption, brain health", daily: "20–35% of total calories", deficiency: "Dry skin, hormonal imbalance, poor vitamin absorption", excess: "Cardiovascular disease, obesity", sources: "Nuts, seeds, olive oil, coconut, avocado, fish", score: 75 },
+  { name: "Fiber", icon: "ti-wheat", color: "green", fn: "Gut health, blood sugar regulation, cholesterol control", daily: "25 g (women) / 38 g (men)", deficiency: "Constipation, high cholesterol, blood sugar swings", excess: "Bloating, gas if increased rapidly", sources: "Oats, lentils, beans, fruits, vegetables, whole grains", score: 82 },
+  { name: "Vitamin A", icon: "ti-eye", color: "amber", fn: "Vision, immune function, skin health", daily: "700–900 mcg RAE", deficiency: "Night blindness, dry skin, poor immunity", excess: "Liver damage (from supplements)", sources: "Carrots, sweet potato, spinach, mango, milk", score: 78 },
+  { name: "Vitamin B12", icon: "ti-brain", color: "purple", fn: "Nerve function, red blood cell formation, DNA synthesis", daily: "2.4 mcg", deficiency: "Anaemia, nerve damage, fatigue, memory issues", excess: "Generally safe; very rare toxicity", sources: "Eggs, milk, meat, fish, fortified cereals", score: 90 },
+  { name: "Vitamin C", icon: "ti-lemon", color: "teal", fn: "Antioxidant, collagen synthesis, immune boost, iron absorption", daily: "65–90 mg", deficiency: "Scurvy, bleeding gums, poor wound healing, fatigue", excess: "Kidney stones, GI discomfort at >2000 mg", sources: "Oranges, lemon, guava, amla, bell pepper, kiwi", score: 88 },
+  { name: "Vitamin D", icon: "ti-sun", color: "amber", fn: "Calcium absorption, bone strength, immune modulation", daily: "600–800 IU (15–20 mcg)", deficiency: "Rickets, osteoporosis, fatigue, depression", excess: "Hypercalcemia, kidney damage", sources: "Sunlight, salmon, egg yolk, fortified milk", score: 85 },
+  { name: "Iron", icon: "ti-bolt", color: "coral", fn: "Oxygen transport in blood via haemoglobin", daily: "8 mg (men) / 18 mg (women)", deficiency: "Anaemia, fatigue, pale skin, hair fall, cold hands", excess: "Organ damage (haemochromatosis)", sources: "Spinach, lentils, red meat, tofu, pumpkin seeds, dates", score: 92 },
+  { name: "Calcium", icon: "ti-bone", color: "blue", fn: "Bone and teeth strength, muscle contraction, nerve signalling", daily: "1000–1200 mg", deficiency: "Weak bones, muscle cramps, dental problems", excess: "Kidney stones, poor absorption of other minerals", sources: "Milk, yogurt, cheese, kale, broccoli, sesame seeds, tofu", score: 88 },
+  { name: "Zinc", icon: "ti-shield", color: "teal", fn: "Immune defence, wound healing, taste and smell", daily: "8–11 mg", deficiency: "Slow wound healing, poor immunity, hair loss, low appetite", excess: "Nausea, reduced copper absorption", sources: "Pumpkin seeds, meat, shellfish, legumes, nuts", score: 77 },
+  { name: "Magnesium", icon: "ti-heartbeat", color: "green", fn: "Muscle and nerve function, energy production, sleep quality", daily: "310–420 mg", deficiency: "Muscle cramps, anxiety, poor sleep, constipation", excess: "Diarrhoea (from supplements)", sources: "Dark chocolate, almonds, spinach, banana, whole grains", score: 83 },
+  { name: "Potassium", icon: "ti-activity", color: "amber", fn: "Blood pressure regulation, heart rhythm, fluid balance", daily: "2600–3400 mg", deficiency: "Muscle weakness, cramps, fatigue, heart irregularities", excess: "Hyperkalemia — dangerous for kidneys", sources: "Banana, potato, coconut water, lentils, spinach, avocado", score: 80 },
+];
+
+const FOODS = [
+  { name: "Egg", emoji: "🥚", protein:"H", calcium:"M", iron:"L", vitC:"N", fiber:"N", vitD:"H" },
+  { name: "Spinach", emoji: "🥬", protein:"L", calcium:"H", iron:"H", vitC:"M", fiber:"H", vitD:"N" },
+  { name: "Orange", emoji: "🍊", protein:"L", calcium:"L", iron:"L", vitC:"H", fiber:"M", vitD:"N" },
+  { name: "Chicken Breast", emoji: "🍗", protein:"H", calcium:"L", iron:"M", vitC:"N", fiber:"N", vitD:"M" },
+  { name: "Milk (full fat)", emoji: "🥛", protein:"M", calcium:"H", iron:"L", vitC:"L", fiber:"N", vitD:"H" },
+  { name: "Lentils (Dal)", emoji: "🫘", protein:"H", calcium:"M", iron:"H", vitC:"L", fiber:"H", vitD:"N" },
+  { name: "Banana", emoji: "🍌", protein:"L", calcium:"L", iron:"L", vitC:"M", fiber:"M", vitD:"N" },
+  { name: "Salmon", emoji: "🐟", protein:"H", calcium:"M", iron:"M", vitC:"N", fiber:"N", vitD:"H" },
+  { name: "Sweet Potato", emoji: "🍠", protein:"L", calcium:"L", iron:"M", vitC:"M", fiber:"H", vitD:"N" },
+  { name: "Almonds", emoji: "🌰", protein:"H", calcium:"H", iron:"M", vitC:"N", fiber:"H", vitD:"N" },
+  { name: "Tofu", emoji: "🫙", protein:"H", calcium:"H", iron:"M", vitC:"N", fiber:"L", vitD:"N" },
+  { name: "Guava", emoji: "🍈", protein:"L", calcium:"L", iron:"L", vitC:"H", fiber:"H", vitD:"N" },
+  { name: "Paneer", emoji: "🧀", protein:"H", calcium:"H", iron:"L", vitC:"N", fiber:"N", vitD:"M" },
+  { name: "Pumpkin Seeds", emoji: "🌱", protein:"H", calcium:"M", iron:"H", vitC:"N", fiber:"H", vitD:"N" },
+  { name: "Oats", emoji: "🌾", protein:"M", calcium:"L", iron:"M", vitC:"N", fiber:"H", vitD:"N" },
+];
+
+const SYMPTOMS = ["Fatigue","Hair fall","Weak bones","Poor immunity","Pale skin","Night blindness","Muscle cramps","Bleeding gums","Brain fog","Low mood","Dry skin","Poor concentration","Slow healing","Cold hands/feet","Brittle nails","Loss of taste/smell"];
+
+const SYMPTOM_MAP = {
+  "Fatigue": ["Iron deficiency","Vitamin B12 deficiency","Vitamin D deficiency","Magnesium deficiency"],
+  "Hair fall": ["Iron deficiency","Zinc deficiency","Protein deficiency","Biotin (B7) deficiency"],
+  "Weak bones": ["Calcium deficiency","Vitamin D deficiency","Magnesium deficiency"],
+  "Poor immunity": ["Zinc deficiency","Vitamin C deficiency","Vitamin D deficiency"],
+  "Pale skin": ["Iron deficiency","Vitamin B12 deficiency"],
+  "Night blindness": ["Vitamin A deficiency"],
+  "Muscle cramps": ["Magnesium deficiency","Potassium deficiency","Calcium deficiency"],
+  "Bleeding gums": ["Vitamin C deficiency"],
+  "Brain fog": ["Vitamin B12 deficiency","Iron deficiency","Omega-3 deficiency"],
+  "Low mood": ["Vitamin D deficiency","Magnesium deficiency","Omega-3 deficiency"],
+  "Dry skin": ["Vitamin A deficiency","Vitamin E deficiency","Essential fats deficiency"],
+  "Poor concentration": ["Iron deficiency","Vitamin B12 deficiency"],
+  "Slow healing": ["Zinc deficiency","Vitamin C deficiency","Protein deficiency"],
+  "Cold hands/feet": ["Iron deficiency","Vitamin B12 deficiency","Thyroid issues"],
+  "Brittle nails": ["Iron deficiency","Biotin deficiency","Calcium deficiency"],
+  "Loss of taste/smell": ["Zinc deficiency"],
+};
+
+const DISEASES = [
+  { name: "Diabetes", icon: "ti-droplet-filled", color: "amber", causes: "Insulin resistance, obesity, genetics, inactivity", symptoms: "Frequent urination, thirst, blurred vision, fatigue", prevent: "Regular exercise, reduce sugar, maintain healthy weight", eat: "Whole grains, vegetables, legumes, nuts, lean protein", avoid: "Sugary drinks, white bread, processed foods, fried items" },
+  { name: "Obesity", icon: "ti-scale", color: "coral", causes: "Excess calorie intake, sedentary lifestyle, hormonal issues, genetics", symptoms: "High BMI, breathlessness, joint pain, fatigue", prevent: "Balanced diet, daily exercise, sleep hygiene, stress management", eat: "Vegetables, lean protein, whole grains, fibre-rich foods", avoid: "Ultra-processed foods, sugary drinks, refined carbs" },
+  { name: "Anaemia", icon: "ti-bolt", color: "red", causes: "Iron, B12, or folate deficiency; blood loss; chronic disease", symptoms: "Pale skin, extreme fatigue, shortness of breath, cold extremities", prevent: "Iron-rich diet, vitamin C to boost absorption, regular screening", eat: "Spinach, lentils, red meat, eggs, dates, sesame", avoid: "Tea/coffee with meals (blocks iron absorption), excess dairy" },
+  { name: "Osteoporosis", icon: "ti-bone", color: "blue", causes: "Low calcium/vitamin D, ageing, hormonal changes, inactivity", symptoms: "Bone fractures, stooped posture, back pain, height loss", prevent: "Weight-bearing exercise, adequate calcium and vitamin D", eat: "Milk, yogurt, tofu, kale, sesame, almonds, sunlight exposure", avoid: "Excess alcohol, smoking, very high salt or caffeine intake" },
+  { name: "Hypertension", icon: "ti-heart-rate-monitor", color: "purple", causes: "High sodium intake, obesity, stress, genetics, inactivity", symptoms: "Headaches, shortness of breath, nosebleeds, dizziness", prevent: "DASH diet, reduce salt, exercise daily, manage stress", eat: "Banana, leafy greens, beets, olive oil, fish, berries", avoid: "Processed foods, excess salt, red meat, alcohol, caffeine excess" },
+];
+
+const FITNESS_DATA = {
+  home: { title: "Home workouts", items: [
+    { name: "Push-ups", sets: "3×15", tip: "Great for chest, shoulders, triceps" },
+    { name: "Squats", sets: "3×20", tip: "Strengthen quads, glutes, core" },
+    { name: "Plank", sets: "3×45s", tip: "Core stability and posture" },
+    { name: "Mountain Climbers", sets: "3×30s", tip: "Cardio + core combo" },
+    { name: "Lunges", sets: "3×12 per leg", tip: "Balance and leg strength" },
+    { name: "Burpees", sets: "3×10", tip: "Full-body fat burner" },
+  ]},
+  gym: { title: "Gym workouts", items: [
+    { name: "Bench Press", sets: "4×10", tip: "Chest and tricep builder" },
+    { name: "Deadlift", sets: "4×6", tip: "Full posterior chain strength" },
+    { name: "Lat Pulldown", sets: "3×12", tip: "Back width and thickness" },
+    { name: "Leg Press", sets: "3×15", tip: "Quad-dominant lower body" },
+    { name: "Shoulder Press", sets: "3×12", tip: "Overhead strength and shoulder width" },
+    { name: "Cable Row", sets: "3×12", tip: "Mid-back development" },
+  ]},
+  stretch: { title: "Stretching routine", items: [
+    { name: "Hip flexor stretch", sets: "Hold 30s × 2", tip: "Relieves lower back tension" },
+    { name: "Seated hamstring stretch", sets: "Hold 30s × 2", tip: "Reduces risk of injury" },
+    { name: "Chest opener", sets: "Hold 30s × 2", tip: "Improves posture for desk workers" },
+    { name: "Neck rolls", sets: "5 reps each side", tip: "Releases tension headaches" },
+    { name: "Cat-cow", sets: "10 reps", tip: "Spinal mobility and flexibility" },
+    { name: "Child's pose", sets: "Hold 1 min", tip: "Rest and full-body stretch" },
+  ]},
+  loss: { title: "Weight loss plan", items: [
+    { name: "Morning walk / jog", sets: "30–45 mins daily", tip: "Burns fat in fasted state" },
+    { name: "Calorie deficit diet", sets: "−300 to −500 kcal", tip: "Lose 0.5 kg/week safely" },
+    { name: "HIIT cardio", sets: "20 mins, 3×/week", tip: "Burns more in less time" },
+    { name: "High protein diet", sets: "1.2–1.6 g/kg", tip: "Preserves muscle while cutting" },
+    { name: "Avoid liquid calories", sets: "Daily habit", tip: "Sugary drinks are silent gains" },
+    { name: "Strength training", sets: "3×/week", tip: "Raises resting metabolism" },
+  ]},
+  muscle: { title: "Muscle gain plan", items: [
+    { name: "Progressive overload", sets: "Increase weight weekly", tip: "Core principle of hypertrophy" },
+    { name: "Calorie surplus diet", sets: "+300–500 kcal", tip: "Lean bulk, minimise fat gain" },
+    { name: "High protein intake", sets: "1.6–2.2 g/kg", tip: "Muscle protein synthesis" },
+    { name: "Compound lifts", sets: "Squat, Deadlift, Press", tip: "Maximum muscle activation" },
+    { name: "Rest days", sets: "2 per week", tip: "Muscle grows during recovery" },
+    { name: "Creatine (optional)", sets: "5 g/day", tip: "Well-studied performance aid" },
+  ]},
+};
+
+const NUTRIENT_MAP = {
+  "Calcium": ["Milk 🥛","Cheese 🧀","Kale 🥬","Almonds 🌰","Tofu 🫙","Broccoli 🥦","Sesame seeds 🌱"],
+  "Iron": ["Spinach 🥬","Red meat 🥩","Lentils 🫘","Tofu 🫙","Pumpkin seeds 🌱","Dates 🌴","Dark chocolate 🍫"],
+  "Vitamin C": ["Guava 🍈","Amla 🟢","Orange 🍊","Lemon 🍋","Bell pepper 🫑","Kiwi 🥝","Papaya 🍐"],
+  "Protein": ["Chicken 🍗","Eggs 🥚","Lentils 🫘","Paneer 🧀","Fish 🐟","Tofu 🫙","Almonds 🌰"],
+  "Vitamin D": ["Sunlight ☀️","Salmon 🐟","Egg yolk 🥚","Fortified milk 🥛","Mushrooms 🍄"],
+  "Magnesium": ["Dark chocolate 🍫","Almonds 🌰","Spinach 🥬","Banana 🍌","Oats 🌾"],
+  "Potassium": ["Banana 🍌","Coconut water 🥥","Potato 🥔","Spinach 🥬","Lentils 🫘","Avocado 🥑"],
+  "Zinc": ["Pumpkin seeds 🌱","Meat 🥩","Chickpeas 🫘","Nuts 🌰","Crab 🦀"],
+};
+
+// --- LOGIC FUNCTIONS ---
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  
+  // Force reflow to re-trigger the CSS animation
+  const sec = document.getElementById('sec-'+id);
+  void sec.offsetWidth; 
+  sec.classList.add('visible');
+  
+  const btns = document.querySelectorAll('.nav-btn');
+  btns.forEach(b => { if(b.getAttribute('onclick')===`showSection('${id}')`) b.classList.add('active'); });
+  
+  if(id==='nutrients' && !document.getElementById('nut-list').innerHTML) renderNutrients(NUTRIENTS);
+  if(id==='foods' && !document.getElementById('food-tbody').innerHTML) renderFoods(FOODS);
+  if(id==='deficiency' && !document.getElementById('symptom-chips').innerHTML) renderSymptoms();
+  if(id==='diseases' && !document.getElementById('disease-chips').innerHTML) renderDiseases();
+  if(id==='fitness' && !document.getElementById('fitness-detail').innerHTML) renderFitness('home');
+  if(id==='home' && !document.getElementById('nutrient-chips').innerHTML) renderNutrientMap();
+}
+
+function renderNutrients(list) {
+  const el = document.getElementById('nut-list');
+  el.innerHTML = list.map(n => `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+        <div style="display:flex;align-items:center;gap:8px">
+          <i class="ti ${n.icon}" style="font-size:20px;color:var(--green-600)" aria-hidden="true"></i>
+          <span style="font-size:16px;font-weight:600;color:var(--color-text-primary)">${n.name}</span>
+        </div>
+        <span class="tag ${n.color}">Importance ${n.score}/100</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${n.score}%"></div></div>
+      <div class="grid-2" style="margin-top:1rem;gap:12px">
+        <div><div class="section-label">Function</div><div style="font-size:13px;color:var(--color-text-primary);line-height:1.5">${n.fn}</div></div>
+        <div><div class="section-label">Daily requirement</div><div style="font-size:13px;color:var(--color-text-primary);line-height:1.5">${n.daily}</div></div>
+        <div><div class="section-label">Deficiency signs</div><div style="font-size:13px;color:var(--color-text-primary);line-height:1.5">${n.deficiency}</div></div>
+        <div><div class="section-label">Excess effects</div><div style="font-size:13px;color:var(--color-text-primary);line-height:1.5">${n.excess}</div></div>
+      </div>
+      <div style="margin-top:1rem"><div class="section-label">Food sources</div><div style="font-size:13px;color:var(--color-text-primary)">${n.sources}</div></div>
+    </div>
+  `).join('');
+}
+
+function filterNutrients() {
+  const q = document.getElementById('nut-search').value.toLowerCase();
+  const filtered = NUTRIENTS.filter(n => n.name.toLowerCase().includes(q) || n.sources.toLowerCase().includes(q) || n.fn.toLowerCase().includes(q));
+  renderNutrients(filtered);
+}
+
+function renderFoods(list) {
+  const levelText = { H:'High', M:'Medium', L:'Low', N:'None' };
+  document.getElementById('food-tbody').innerHTML = list.map(f => `
+    <tr>
+      <td style="font-weight:500; font-size:14px;">${f.emoji} ${f.name}</td>
+      <td><span class="level ${f.protein}">${levelText[f.protein]}</span></td>
+      <td><span class="level ${f.calcium}">${levelText[f.calcium]}</span></td>
+      <td><span class="level ${f.iron}">${levelText[f.iron]}</span></td>
+      <td><span class="level ${f.vitC}">${levelText[f.vitC]}</span></td>
+      <td><span class="level ${f.fiber}">${levelText[f.fiber]}</span></td>
+      <td><span class="level ${f.vitD}">${levelText[f.vitD]}</span></td>
+    </tr>
+  `).join('');
+}
+
+function filterFoods() {
+  const q = document.getElementById('food-search').value.toLowerCase();
+  const nutrientKeys = {calcium:'calcium',protein:'protein',iron:'iron','vitamin c':'vitC','fiber':'fiber','vitamin d':'vitD'};
+  let filtered = FOODS;
+  for(const [kw, key] of Object.entries(nutrientKeys)) {
+    if(q.includes(kw)) { filtered = FOODS.filter(f => f[key]==='H'); break; }
+  }
+  if(!Object.keys(nutrientKeys).some(k => q.includes(k))) {
+    filtered = FOODS.filter(f => f.name.toLowerCase().includes(q));
+  }
+  renderFoods(filtered.length ? filtered : FOODS);
+}
+
+function renderSymptoms() {
+  document.getElementById('symptom-chips').innerHTML = SYMPTOMS.map(s =>
+    `<span class="chip" onclick="toggleSymptom(this,'${s}')">${s}</span>`
+  ).join('');
+}
+
+function toggleSymptom(el, s) { el.classList.toggle('selected'); }
+
+function checkDeficiency() {
+  const selected = Array.from(document.querySelectorAll('#symptom-chips .chip.selected')).map(c => c.textContent);
+  if(!selected.length) { document.getElementById('def-result').innerHTML = '<div class="card" style="color:var(--color-text-secondary);font-size:14px">Please select at least one symptom.</div>'; return; }
+  const counts = {};
+  selected.forEach(s => { (SYMPTOM_MAP[s]||[]).forEach(d => { counts[d]=(counts[d]||0)+1; }); });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('def-result').innerHTML = `
+    <div class="card">
+      <div class="section-label">Possible deficiencies (based on ${selected.length} symptom${selected.length>1?'s':''})</div>
+      ${sorted.map(([d,c]) => `
+        <div class="row-item">
+          <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">${d}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="font-size:12px;color:var(--color-text-secondary)">${c} matching symptom${c>1?'s':''}</div>
+            <div class="dots">${[1,2,3,4,5].map(i=>`<div class="dot${i<=Math.min(c,5)?' filled':''}"></div>`).join('')}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderDiseases() {
+  document.getElementById('disease-chips').innerHTML = DISEASES.map((d,i) =>
+    `<span class="chip${i===0?' selected':''}" onclick="showDisease(${i},this)">${d.name}</span>`
+  ).join('');
+  showDisease(0);
+}
+
+function showDisease(i, el) {
+  document.querySelectorAll('#disease-chips .chip').forEach(c => c.classList.remove('selected'));
+  if(el) el.classList.add('selected');
+  const d = DISEASES[i];
+  document.getElementById('disease-detail').innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem">
+        <i class="ti ${d.icon}" style="font-size:24px;color:var(--green-600)" aria-hidden="true"></i>
+        <span style="font-size:18px;font-weight:600;color:var(--color-text-primary)">${d.name}</span>
+      </div>
+      <div class="grid-2" style="gap:16px">
+        <div><div class="section-label">Causes</div><div style="font-size:13px;line-height:1.6;color:var(--color-text-primary)">${d.causes}</div></div>
+        <div><div class="section-label">Symptoms</div><div style="font-size:13px;line-height:1.6;color:var(--color-text-primary)">${d.symptoms}</div></div>
+        <div><div class="section-label">Prevention</div><div style="font-size:13px;line-height:1.6;color:var(--color-text-primary)">${d.prevent}</div></div>
+        <div><div class="section-label">Foods to limit</div><div style="font-size:13px;line-height:1.6;color:var(--color-text-primary)">${d.avoid}</div></div>
+      </div>
+      <div style="margin-top:1rem"><div class="section-label">Recommended foods</div><div style="font-size:13px;line-height:1.6;color:var(--color-text-primary)">${d.eat}</div></div>
+    </div>
+  `;
+}
+
+function selectFitness(type, el) {
+  document.querySelectorAll('#sec-fitness .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  renderFitness(type);
+}
+
+function renderFitness(type) {
+  const data = FITNESS_DATA[type];
+  document.getElementById('fitness-detail').innerHTML = `
+    <div class="card">
+      <div class="section-label">${data.title}</div>
+      ${data.items.map(e => `
+        <div class="row-item" style="align-items:flex-start;flex-direction:column;gap:4px;padding:12px 0">
+          <div style="display:flex;justify-content:space-between;width:100%">
+            <span style="font-size:14px;font-weight:600;color:var(--color-text-primary)">${e.name}</span>
+            <span class="tag green">${e.sets}</span>
+          </div>
+          <span style="font-size:13px;color:var(--color-text-secondary)">${e.tip}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function calcBMI() {
+  const h = +document.getElementById('bmi-h').value;
+  const w = +document.getElementById('bmi-w').value;
+  const g = document.getElementById('bmi-gender').value;
+  if(!h||!w) return;
+  const bmi = +(w / ((h/100)**2)).toFixed(1);
+  let cat, calBase, foods, exer;
+  if(bmi < 18.5) { cat='Underweight'; calBase = g==='Male' ? 2500 : 2200; foods='Rice, roti, lentils, paneer, whole milk, nuts, banana, dates'; exer='Light cardio, strength training, yoga'; }
+  else if(bmi < 25) { cat='Normal weight'; calBase = g==='Male' ? 2200 : 1900; foods='Balanced — veggies, whole grains, lean protein, fruits, dairy'; exer='Mixed cardio and strength, 150 min/week'; }
+  else if(bmi < 30) { cat='Overweight'; calBase = g==='Male' ? 1800 : 1600; foods='Vegetables, legumes, whole grains, lean protein; reduce refined carbs'; exer='Daily 30-min walk, HIIT 3×/week, strength training'; }
+  else { cat='Obese'; calBase = g==='Male' ? 1600 : 1400; foods='High fibre vegetables, legumes, lean protein; strict sugar and fat reduction'; exer='Low-impact: walking, swimming, cycling; consult a doctor before intense exercise'; }
+  document.getElementById('bmi-val').textContent = bmi;
+  document.getElementById('bmi-cat').textContent = cat;
+  document.getElementById('bmi-cal').textContent = calBase + ' kcal/day';
+  document.getElementById('bmi-cal-sub').textContent = 'Approximate estimate for ' + (g==='Male'?'male':'female');
+  document.getElementById('bmi-foods').innerHTML = foods;
+  document.getElementById('bmi-exer').innerHTML = exer;
+  document.getElementById('bmi-result').style.display = 'block';
+}
+
+function calcWater() {
+  const w = +document.getElementById('w-weight').value;
+  const act = +document.getElementById('w-activity').value;
+  const clim = +document.getElementById('w-climate').value;
+  if(!w) return;
+  const base = w * 0.033;
+  const total = +(base * act + clim).toFixed(1);
+  document.getElementById('water-val').textContent = total + ' L/day';
+  document.getElementById('water-sub').textContent = 'Approx ' + Math.round(total * 1000 / 250) + ' glasses of 250 ml each';
+  document.getElementById('water-tips').innerHTML = `Drink 1–2 glasses on waking up · carry a water bottle · eat water-rich foods like cucumber and watermelon · increase by 0.5 L on workout days · watch urine colour — pale yellow is the target.`;
+  document.getElementById('water-result').style.display = 'block';
+}
+
+function calcCalories() {
+  const age = +document.getElementById('c-age').value;
+  const h = +document.getElementById('c-h').value;
+  const w = +document.getElementById('c-w').value;
+  const g = document.getElementById('c-gender').value;
+  const act = +document.getElementById('c-act').value;
+  if(!age||!h||!w) return;
+  let bmr = g==='m' ? (10*w + 6.25*h - 5*age + 5) : (10*w + 6.25*h - 5*age - 161);
+  const main = Math.round(bmr * act);
+  document.getElementById('cal-bmr').textContent = Math.round(bmr) + ' kcal';
+  document.getElementById('cal-main').textContent = main + ' kcal';
+  document.getElementById('cal-loss').textContent = (main-500) + ' kcal';
+  document.getElementById('cal-gain').textContent = (main+500) + ' kcal';
+  document.getElementById('cal-result').style.display = 'block';
+}
+
+function renderNutrientMap() {
+  const keys = Object.keys(NUTRIENT_MAP);
+  document.getElementById('nutrient-chips').innerHTML = keys.map(k =>
+    `<span class="chip" onclick="showNutrientMap('${k}',this)">${k}</span>`
+  ).join('');
+}
+
+function showNutrientMap(nutrient, el) {
+  document.querySelectorAll('#nutrient-chips .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const sources = NUTRIENT_MAP[nutrient];
+  document.getElementById('food-map-result').innerHTML = `
+    <div style="margin-bottom:8px;font-size:14px;font-weight:600;color:var(--color-text-primary)">Top sources of ${nutrient}:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      ${sources.map(s => `<span style="padding:6px 14px;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:13px;color:var(--color-text-primary);box-shadow:0 2px 4px rgba(0,0,0,0.02)">${s}</span>`).join('')}
+    </div>
+  `;
+}
+
+// AI Chat Integration
+const aiHistory = [];
+async function askAI(promptOverride) {
+  const input = document.getElementById('ai-input');
+  const userMsg = promptOverride || input.value.trim();
+  if(!userMsg) return;
+  
+  input.value = '';
+  const msgs = document.getElementById('ai-messages');
+  msgs.innerHTML += `<div class="ai-msg user">${userMsg}</div>`;
+  msgs.innerHTML += `<div class="ai-msg ai-thinking" id="ai-thinking">Thinking…</div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  aiHistory.push({ role:'user', content: userMsg });
+  
+  try {
+    const res = await fetch('/api/ask', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:600,
+        system:'You are a friendly and knowledgeable Health & Nutrition AI assistant on a Health Knowledge Hub website. Answer questions about nutrients, foods, deficiencies, diets, fitness, and wellness. Be concise (3–5 sentences), friendly, practical, and India-aware (mention local foods like dal, roti, paneer where relevant). Always end with a disclaimer if discussing symptoms or medical conditions. Never diagnose — only educate.',
+        messages: aiHistory
+      })
+    });
+    
+    if (!res.ok) throw new Error("Network response was not ok");
+    
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Sorry, I could not get a response right now. Please try again.';
+    aiHistory.push({ role:'assistant', content: reply });
+    
+    document.getElementById('ai-thinking').outerHTML = `<div class="ai-msg"><strong style="font-size:13px;color:var(--green-600);display:block;margin-bottom:4px;">Health Hub AI</strong>${reply.replace(/\n/g,'<br>')}</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  } catch(e) {
+    document.getElementById('ai-thinking').outerHTML = `<div class="ai-msg" style="color:var(--coral-600); border-color:var(--coral-50); background:var(--coral-50)"><strong>Note:</strong> API connection requires an active API key setup in your backend/fetch headers to function.</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+}
+
+// --- INIT SETTINGS ---
+// Dark mode toggle listener
+document.getElementById('theme-toggle').addEventListener('click', function() {
+  document.body.classList.toggle('dark-vibe');
+  const icon = this.querySelector('i');
+  if (document.body.classList.contains('dark-vibe')) {
+    icon.classList.replace('ti-moon', 'ti-sun');
+    icon.style.color = 'var(--amber-600)';
+  } else {
+    icon.classList.replace('ti-sun', 'ti-moon');
+    icon.style.color = 'var(--color-text-primary)';
+  }
+});
+
+// Start by showing home section
+window.onload = function() {
+  showSection('home');
+};
+</script>
+
+</body>
+</html>
